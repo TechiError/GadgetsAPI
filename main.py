@@ -65,7 +65,7 @@ async def fetch_gadgets360(query: str):
     for item in soup.find_all("div", class_="rvw-imgbox"):
         title = item.find("img")["title"]
         cont = BeautifulSoup(
-            await (await session.get(item.find("a")["href"])).text(), "html.parser"
+            await (await session.get(item.find("a")["href"])).content.read(), "html.parser"
         )
         req = cont.find_all("div", "_pdsd")
         jsun = {"title": title}
