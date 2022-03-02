@@ -7,7 +7,8 @@ An API to search for Gadgets on [Gadgetsnow](https://gadgetsnow.com) & [Gadgets3
 #### Get Gadget details from [GadgetsNow](https://www.gadgetsnow.com/).
 
 ```http
-GET /gadgetsnow/${query}
+GET /gadgetsnow/{query} HTTP/1.1
+Content-Type: application/x-www-form-urlencoded
 ```
 
 | Parameter | Type     | Description                |
@@ -17,7 +18,8 @@ GET /gadgetsnow/${query}
 #### Get Gadget details from [Gadgets360](https://www.gadgets360.com/).
 
 ```http
-GET /gadgets360/${query}
+GET /gadgets360/{query} HTTP/1.1
+Content-Type: application/x-www-form-urlencoded
 ```
 
 | Parameter | Type     | Description                       |
