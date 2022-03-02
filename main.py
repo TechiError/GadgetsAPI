@@ -48,7 +48,7 @@ async def fetch_url(url):
             await session.close()
             print(time.time() - starttime)
             return results
-            
+
         else:
             return {"error": True, "error_message": "No results found"}
     except Exception as e:
@@ -65,7 +65,7 @@ async def fetch_gadgets360(query: str):
     for item in soup.find_all("div", class_="rvw-imgbox"):
         title = item.find("img")["title"]
         cont = BeautifulSoup(
-            (await session.get(item.find("a")["href"])).content, "html.parser"
+            await (await session.get(item.find("a")["href"])).text(), "html.parser"
         )
         req = cont.find_all("div", "_pdsd")
         jsun = {"title": title}
