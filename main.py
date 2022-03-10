@@ -1,7 +1,7 @@
 import traceback
 import fastapi
-import re, aiohttp, asyncio
-import json, time
+import re, aiohttp, asyncio, uvicorn
+import json, time, os
 from bs4 import BeautifulSoup
 
 
@@ -25,6 +25,7 @@ async def fetch_url(url):
 
         if len(data) > 0:
             results = []
+
             async def extract_results(i):
                 i.update(
                     (
@@ -45,11 +46,14 @@ async def fetch_url(url):
                 if i.get("userReview"):
                     i.pop("userReview")
                 results.append(i)
-            await asyncio.gather(*[extract_results(i) for i in data[0]["gadgets"]["data"]])
+
+            await asyncio.gather(
+                *[extract_results(i) for i in data[0]["gadgets"]["data"]]
+            )
             await session.close()
             print(time.time() - starttime)
             return results
-            
+
         else:
             return {"error": True, "error_message": "No results found"}
     except Exception as e:
@@ -64,19 +68,26 @@ async def fetch_gadgets360(query: str):
     r = await session.get(f"https://gadgets360.com/search?searchtext={query}")
     soup = BeautifulSoup(await r.content.read(), "html.parser")
     results = []
+
     async def extract_results(item):
         title = item.find("img")["title"]
         cont = BeautifulSoup(
-            await (await session.get(item.find("a")["href"])).content.read(), "html.parser"
+            await (await session.get(item.find("a")["href"])).content.read(),
+            "html.parser",
         )
         req = cont.find_all("div", "_pdsd")
         jsun = {"title": title}
+
         async def fp_in_req(fp):
             ty = fp.findNext()
             jsun.update({ty.text: ty.findNext().text})
+
         await asyncio.gather(*[fp_in_req(i) for i in req])
         results.append(jsun)
-    await asyncio.gather(*[extract_results(item) for item in soup.find_all("div", class_="rvw-imgbox")])
+
+    await asyncio.gather(
+        *[extract_results(item) for item in soup.find_all("div", class_="rvw-imgbox")]
+    )
     print(time.time() - starttime)
     await session.close()
     return results
